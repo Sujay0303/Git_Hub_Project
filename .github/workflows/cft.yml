@@ -1,36 +1,37 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Create an S3 Bucket"
 
-Resources:
-    MyS3Bucket:
-        Type: AWS::S3::Bucket
-        DeletionPolicy: Delete
-        Properties:
-            BucketName: oneandonlyonebucket11
+# Resources:
+#     MyS3Bucket:
+#         Type: AWS::S3::Bucket
+#         DeletionPolicy: Delete
+#         Properties:
+#             BucketName: oneandonlyonebucket11
     
-    GlueJobImport:
-        Type: AWS::Glue::Job
-        DependsOn: MyS3Bucket
-        Properties:
-            Name: data-importsep37
-            Description: Ingests data from s3 and writes it as a parquet file to the data lake
-            ExecutionClass: FLEX
-            GlueVersion: 4.0
-            MaxRetries: 0
-            NumberOfWorkers: 6
-            Role: arn:aws:iam::672497526349:role/LabRole
-            Timeout: 40
-            WorkerType: G.1X
-            Command:
-                Name: glueetl
-                ScriptLocation: s3://github-project-scripts/Small_Script.py
+#     GlueJobImport:
+#         Type: AWS::Glue::Job
+#         DependsOn: MyS3Bucket
+#         Properties:
+#             Name: data-importsep37
+#             Description: Ingests data from s3 and writes it as a parquet file to the data lake
+#             ExecutionClass: FLEX
+#             GlueVersion: 4.0
+#             MaxRetries: 0
+#             NumberOfWorkers: 6
+#             Role: arn:aws:iam::672497526349:role/LabRole
+#             Timeout: 40
+#             WorkerType: G.1X
+#             Command:
+#                 Name: glueetl
+#                 ScriptLocation: s3://github-project-scripts/Small_Script.py
 
     GlueDatabase:
         Type: AWS::Glue::Database
         Properties:
             CatalogId: !Ref AWS::AccountId
             DatabaseInput:
-                Name: firstdatabase  
+                Name: firstdatabase
+                LocationUri: s3://oneandonlyonebucket11/  
     
     GlueCrawler:
         Type: AWS::Glue::Crawler
