@@ -2,76 +2,75 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "Create an S3 Bucket"
 
 Resources:
-    MyS3Bucket:
-        Type: AWS::S3::Bucket
-        DeletionPolicy: Delete
-        DependsOn: S3InvokeLambdaPermission
-        Properties:
-            BucketName: oneandonlyonebucket13
-            LambdaConfigurations:
-              - Event: s3:ObjectCreated:*
-            Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
+  MyS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Delete
+    DependsOn: S3InvokeLambdaPermission
+    Properties:
+      BucketName: oneandonlyonebucket13
+      LambdaConfigurations:
+        - Event: s3:ObjectCreated:*
+          Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
 
-    GlueJobImport:
-        Type: AWS::Glue::Job
-        DependsOn: MyS3Bucket
-        Properties:
-            Name: data
-            Description: Ingests data from s3 and writes it as a parquet file to the data lake
-            ExecutionClass: FLEX
-            GlueVersion: 4.0
-            MaxRetries: 0
-            NumberOfWorkers: 6
-            Role: arn:aws:iam::672497526349:role/LabRole
-            Timeout: 40
-            WorkerType: G.1X
-            Command:
-                Name: glueetl
-                ScriptLocation: s3://github-project-scripts/Small_Script.py
+  GlueJobImport:
+    Type: AWS::Glue::Job
+    DependsOn: MyS3Bucket
+    Properties:
+      Name: data
+      Description: Ingests data from s3 and writes it as a parquet file to the data lake
+      ExecutionClass: FLEX
+      GlueVersion: 4.0
+      MaxRetries: 0
+      NumberOfWorkers: 6
+      Role: arn:aws:iam::672497526349:role/LabRole
+      Timeout: 40
+      WorkerType: G.1X
+      Command:
+        Name: glueetl
+        ScriptLocation: s3://github-project-scripts/Small_Script.py
 
-    GlueDatabase:
-        Type: AWS::Glue::Database
-        Properties:
-            CatalogId: !Ref AWS::AccountId
-            DatabaseInput:
-                Name: firstdatabase1
-                LocationUri: s3://oneandonlyonebucket13/  
-    
-    GlueCrawler:
-        Type: AWS::Glue::Crawler
-        Properties:
-            Name: gluecrawler1
-            DatabaseName:  firstdatabase1
-            Targets:
-                S3Targets:
-                    - Path: s3://oneandonlyonebucket13/
-            Role: arn:aws:iam::672497526349:role/LabRole
+  GlueDatabase:
+    Type: AWS::Glue::Database
+    Properties:
+      CatalogId: !Ref AWS::AccountId
+      DatabaseInput:
+        Name: firstdatabase1
+        LocationUri: s3://oneandonlyonebucket13/
 
-    LambdaTrigger:
-        Type: AWS::Lambda::Function
-        Properties:
-          Code:
-            ZipFile: |
-              import boto3
-              def lambda_handler(event, context):
-                glue_client = boto3.client('glue')
-                response = glue_client.start_crawler(Name=gluecrawler1)
-          FunctionName: TriggerLambda
-          Handler: index.lambda_handler
-          Role: !Ref labRole
-          Runtime: python3.11
-          Timeout: 10
+  GlueCrawler:
+    Type: AWS::Glue::Crawler
+    Properties:
+      Name: gluecrawler1
+      DatabaseName: firstdatabase1
+      Targets:
+        S3Targets:
+          - Path: s3://oneandonlyonebucket13/
+      Role: arn:aws:iam::672497526349:role/LabRole
 
-
-    S3InvokeLambdaPermission:
-        Type: AWS::Lambda::Permission
-        DependsOn:
-          - LambdaTrigger
-        Properties:
-          Action: lambda:InvokeFunction
-          FunctionName: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
-          Principal: "s3.amazonaws.com"
-          SourceArn: 'arn:aws:s3:::oneandonlyonebucket13'
+  LambdaTrigger:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        ZipFile: |
+          import boto3
+          def lambda_handler(event, context):
+            glue_client = boto3.client('glue')
+            response = glue_client.start_crawler(Name="gluecrawler1")
+      FunctionName: TriggerLambda
+      Handler: index.lambda_handler
+      Role: !Ref labRole
+      Runtime: python3.11
+      Timeout: 10
+      
+  S3InvokeLambdaPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - LambdaTrigger
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
+      Principal: "s3.amazonaws.com"
+      SourceArn: 'arn:aws:s3:::oneandonlyonebucket13'
 
     # CrawlerJobTrigger:
     #     Type: AWS::Glue::Trigger
