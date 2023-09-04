@@ -58,10 +58,10 @@ Resources:
             response = glue_client.start_crawler(Name="gluecrawler1")
       FunctionName: TriggerLambda
       Handler: index.lambda_handler
-      Role: !Ref labRole
+      Role: arn:aws:iam::672497526349:role/LabRole
       Runtime: python3.11
       Timeout: 10
-      
+
   S3InvokeLambdaPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
