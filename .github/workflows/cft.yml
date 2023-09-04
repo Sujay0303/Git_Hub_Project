@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: "Create an S3 Bucket"
 
-# Resources:
+Resources:
 #     MyS3Bucket:
 #         Type: AWS::S3::Bucket
 #         DeletionPolicy: Delete
@@ -30,14 +30,14 @@ Description: "Create an S3 Bucket"
         Properties:
             CatalogId: !Ref AWS::AccountId
             DatabaseInput:
-                Name: firstdatabase
+                Name: firstdatabase1
                 LocationUri: s3://oneandonlyonebucket11/  
     
     GlueCrawler:
         Type: AWS::Glue::Crawler
         Properties:
-            Name: gluecrawler
-            DatabaseName:  firstdatabase
+            Name: gluecrawler1
+            DatabaseName:  firstdatabase1
             Targets:
                 S3Targets:
                     - Path: s3://oneandonlyonebucket11/
