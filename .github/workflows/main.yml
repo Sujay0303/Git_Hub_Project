@@ -23,7 +23,7 @@ jobs:
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-            --stack-name Second6 \
+            --stack-name Second7 \
             --template-file .github/workflows/cft.yml \
             --capabilities CAPABILITY_IAM
         env:
