@@ -39,6 +39,7 @@ Resources:
 
   GlueCrawler:
     Type: AWS::Glue::Crawler
+    DependsOn: MyS3Bucket
     Properties:
       Name: gluecrawler1
       DatabaseName: firstdatabase1
