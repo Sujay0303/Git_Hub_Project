@@ -10,9 +10,8 @@ Resources:
             BucketName: oneandonlyonebucket13
             LambdaConfigurations:
               - Event: s3:ObjectCreated:*
-            Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
+            Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLamda
 
-    
     GlueJobImport:
         Type: AWS::Glue::Job
         DependsOn: MyS3Bucket
