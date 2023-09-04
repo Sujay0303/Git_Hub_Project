@@ -4,15 +4,15 @@ Description: "Create an S3 Bucket"
 Resources:
     MyS3Bucket:
         Type: AWS::S3::Bucket
-        DeletionPolicy: Retain
+        DeletionPolicy: Delete
         Properties:
-            BucketName: meriwalibucket2222
+            BucketName: oneandonlyonebucket11
     
     GlueJobImport:
         Type: AWS::Glue::Job
         DependsOn: MyS3Bucket
         Properties:
-            Name: data-merging
+            Name: data-importsep37
             Description: Ingests data from s3 and writes it as a parquet file to the data lake
             ExecutionClass: FLEX
             GlueVersion: 4.0
@@ -25,22 +25,22 @@ Resources:
                 Name: glueetl
                 ScriptLocation: s3://github-project-scripts/Small_Script.py
 
-    # GlueDatabase:
-    #     Type: AWS::Glue::Database
-    #     Properties:
-    #         CatalogId: !Ref AWS::AccountId
-    #         DatabaseInput:
-    #             Name: database64  
+    GlueDatabase:
+        Type: AWS::Glue::Database
+        Properties:
+            CatalogId: !Ref AWS::AccountId
+            DatabaseInput:
+                Name: firstdatabase  
     
-    # GlueCrawler:
-    #     Type: AWS::Glue::Crawler
-    #     Properties:
-    #         Name: CrawlingData64
-    #         DatabaseName:  database64
-    #         Targets:
-    #             S3Targets:
-    #                 - Path: s3://mergeddatar14/datawarehouse/
-    #         Role: arn:aws:iam::467280971091:role/LabRole
+    GlueCrawler:
+        Type: AWS::Glue::Crawler
+        Properties:
+            Name: gluecrawler
+            DatabaseName:  firstdatabase
+            Targets:
+                S3Targets:
+                    - Path: s3://oneandonlyonebucket11/
+            Role: arn:aws:iam::672497526349:role/LabRole
             
     
     # CrawlerJobTrigger:
@@ -51,7 +51,7 @@ Resources:
     #         StartOnCreation: TRUE
     #         Description: Trigger to start the crawler
     #         Actions:
-    #           - Run :  CrawlingData64
+    #           - CrawlerName :  CrawlingData64
     #         Predicate:
     #           Conditions:
     #             - LogicalOperator: EQUALS

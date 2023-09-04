@@ -24,10 +24,10 @@ df4 = spark.read.format("jdbc").option("url", "jdbc:mysql://github-database.cpir
 # df6 = spark.read.format("jdbc").option("url", "jdbc:mysql://github-database.cpirtk1qzqlt.us-east-1.rds.amazonaws.com:3306/projectdb").option("dbtable", "committable").option("user", "admin").option("password", "project1").load()
 
 followerdf = df1.unionByName(df2)
-followerdf.coalesce(1).write.parquet("s3://meriwalibucket2222/followertable")
+followerdf.coalesce(1).write.parquet("s3://oneandonlyonebucket11/followertable")
 
 followingdf = df3.unionByName(df4)
-followingdf.coalesce(1).write.parquet("s3://meriwalibucket2222/followingtable")
+followingdf.coalesce(1).write.parquet("s3://oneandonlyonebucket11/followingtable")
 
 # commitdf = df5.unionByName(df6)
 # commitdf.coalesce(1).write.parquet("s3://mergeddatar14/datawarehouse/committable")
