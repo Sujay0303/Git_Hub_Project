@@ -1,0 +1,75 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create an S3 Bucket"
+
+Resources:
+    MyS3Bucket:
+        Type: AWS::S3::Bucket
+        DeletionPolicy: Delete
+        Properties:
+            BucketName: meriwalibucket1111
+    
+    # GlueJobImport:
+    #     Type: AWS::Glue::Job
+    #     DependsOn: MyS3Bucket
+    #     Properties:
+    #         Name: data-importsep37
+    #         Description: Ingests data from s3 and writes it as a parquet file to the data lake
+    #         ExecutionClass: FLEX
+    #         GlueVersion: 4.0
+    #         MaxRetries: 0
+    #         NumberOfWorkers: 6
+    #         Role: arn:aws:iam::467280971091:role/LabRole
+    #         Timeout: 40
+    #         WorkerType: G.1X
+    #         Command:
+    #             Name: glueetl
+    #             ScriptLocation: s3://github-scrpits/Datawarehouse_Script.py
+
+    # GlueDatabase:
+    #     Type: AWS::Glue::Database
+    #     Properties:
+    #         CatalogId: !Ref AWS::AccountId
+    #         DatabaseInput:
+    #             Name: database64  
+    
+    # GlueCrawler:
+    #     Type: AWS::Glue::Crawler
+    #     Properties:
+    #         Name: CrawlingData64
+    #         DatabaseName:  database64
+    #         Targets:
+    #             S3Targets:
+    #                 - Path: s3://mergeddatar14/datawarehouse/
+    #         Role: arn:aws:iam::467280971091:role/LabRole
+            
+    
+    # CrawlerJobTrigger:
+    #     Type: AWS::Glue::Trigger
+    #     Properties:
+    #         Name: jobsuccesfultrigger1
+    #         Type: CONDITIONAL
+    #         StartOnCreation: TRUE
+    #         Description: Trigger to start the crawler
+    #         Actions:
+    #           - Run :  CrawlingData64
+    #         Predicate:
+    #           Conditions:
+    #             - LogicalOperator: EQUALS
+    #               JobName: data-importsep37
+    #               State: SUCCEEDED
+            
+
+            
+    # MyAthenaWorkGroup:
+    #     Type: AWS::Athena::WorkGroup
+    #     Properties:
+    #         Name: MyWorkGroup
+    #         Description: workgroup for Athena
+    #         State: ENABLED
+    #         WorkGroupConfiguration:
+    #             BytesScannedCutoffPerQuery: 200000000
+    #             EnforceWorkGroupConfiguration: false
+    #             PublishCloudWatchMetricsEnabled: true
+    #             RequesterPaysEnabled: true
+    #             ResultConfiguration:
+    #                 OutputLocation: s3://finalbucketgrp4/
