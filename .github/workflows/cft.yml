@@ -8,9 +8,18 @@ Resources:
     DependsOn: S3InvokeLambdaPermission
     Properties:
       BucketName: oneandonlyonebucket13
-      LambdaConfigurations:
-        - Event: s3:ObjectCreated:*
-        - Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLambda
+      # LambdaConfigurations:
+      #   - Event: s3:ObjectCreated:*
+      #     Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLambda
+  
+  S3BucketNotification:
+    Type: AWS::S3::BucketNotification
+    Properties:
+      Bucket: oneandonlyonebucket13
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:*
+            Function: arn:aws:lambda:us-east-1:672497526349:function:TriggerLambda
 
   GlueJobImport:
     Type: AWS::Glue::Job
