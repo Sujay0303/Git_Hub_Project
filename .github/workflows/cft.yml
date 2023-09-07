@@ -1,0 +1,103 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create AWS Resources"
+
+Resources:
+
+    MyS3Bucket:
+        Type: AWS::S3::Bucket
+        DeletionPolicy: Delete
+        Properties:
+            BucketName: group04datalake
+
+    MyS3Bucket1:
+        Type: AWS::S3::Bucket
+        DeletionPolicy: Delete
+        Properties:
+            BucketName: group04output
+        
+        
+    GlueDatabase:
+        Type: AWS::Glue::Database
+        Properties:
+            CatalogId: !Ref AWS::AccountId
+            DatabaseInput:
+                Name: gitdatabase 
+                   
+
+    WorkflowJob:
+        Type: AWS::Glue::Workflow
+        Properties:
+            Description: Create workflow
+            MaxConcurrentRuns: 1
+            Name: jobworkflow        
+    
+    GlueJobImport:
+        Type: AWS::Glue::Job
+        DependsOn: MyS3Bucket
+        Properties:
+            Name: data-ingestion
+            Description: Ingests data from s3 and writes it as a parquet file to the data lake
+            ExecutionClass: FLEX
+            GlueVersion: 4.0
+            MaxRetries: 0
+            NumberOfWorkers: 6
+            Role: arn:aws:iam::672497526349:role/LabRole
+            Timeout: 40
+            WorkerType: G.1X
+            Command:
+                Name: glueetl
+                ScriptLocation: s3://github-project-scripts/Datawarehouse_Script.py
+
+    
+    GlueCrawler:
+        Type: AWS::Glue::Crawler
+        Properties:
+            Name: CrawlingData
+            DatabaseName:  gitdatabase
+            Targets:
+                S3Targets:
+                    - Path: s3://group04datalake/datawarehouse/
+            Role: arn:aws:iam::672497526349:role/LabRole
+    
+  
+    WorkflowStartTrigger:
+          Type: AWS::Glue::Trigger
+          Properties:
+              Name: StartTrigger
+              Type: ON_DEMAND
+              Description: Trigger for starting the workflow
+              Actions:
+                - JobName: !Ref GlueJobImport
+              WorkflowName:  !Ref WorkflowJob
+
+    CrawlerJobTrigger:
+        Type: AWS::Glue::Trigger
+        Properties:
+            Name: Jobsuccesful
+            Type: CONDITIONAL
+            StartOnCreation: TRUE
+            Description: Trigger to start the crawler
+            Actions:
+              - CrawlerName :  crawlingdata
+            Predicate: 
+              Conditions:
+                - LogicalOperator: EQUALS
+                  JobName: !Ref GlueJobImport
+                  State: SUCCEEDED
+            WorkflowName: !Ref WorkflowJob  
+            
+            
+    MyAthenaWorkGroup:
+        Type: AWS::Athena::WorkGroup
+        Properties:
+            Name: gitworkgrp
+            Description: workgroup for Athena
+            State: ENABLED
+            WorkGroupConfiguration:
+                BytesScannedCutoffPerQuery: 200000000
+                EnforceWorkGroupConfiguration: false
+                PublishCloudWatchMetricsEnabled: true
+                RequesterPaysEnabled: true
+                ResultConfiguration:
+                    OutputLocation: s3://group04output/Query/    
+
