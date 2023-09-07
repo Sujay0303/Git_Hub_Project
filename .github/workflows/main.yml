@@ -1,36 +1,40 @@
-name: create crawler1
+name: AWS Resource Creation 
 
 on:
   push:
     branches:
-      - master
+      - main
   workflow_dispatch:
 
 jobs:
-  build:
+  Deploy_CFT:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@master
+        uses: actions/checkout@v2
 
-      - name: Print Environment Variables
+      - name: Upload Script to S3 Bucket
         run: |
-          echo "AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-          echo "AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}"
-          echo "AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}"
-          echo "AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}"
+          aws s3 cp .github/workflows/Datawarehouse_Script.py s3://github-scrpits/
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-            --stack-name Second9 \
+            --stack-name CFTStack \
             --template-file .github/workflows/cft.yml \
             --capabilities CAPABILITY_IAM
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
-          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_DEFAULT_REGION: us-east-1
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
 
 
 
+
+          
