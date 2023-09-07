@@ -3,7 +3,7 @@ name: AWS Resource Creation
 on:
   push:
     branches:
-      - main
+      - master
   workflow_dispatch:
 
 jobs:
